@@ -6,7 +6,7 @@ import Landing from './pages/Landing';
 function App() {
     return (
         <div className="App">
-            <Router>
+            <Router basename="/quiz-cards">
                 <Routes>
                     <Route path="/" element={<Landing/>}/>
                 </Routes>

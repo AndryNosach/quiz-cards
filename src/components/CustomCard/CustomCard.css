@@ -1,0 +1,58 @@
+.flip-card-container {
+    perspective: 1000px; /* Establishes a 3D perspective for the flip */
+    cursor: pointer;
+    width: 300px;
+    height: 450px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 50px;
+    text-align: center;
+    transition: transform 0.8s; /* Smooth transition for the flip */
+    transform-style: preserve-3d; /* Ensures children are positioned in 3D space */
+}
+
+.flip-card-inner.flipped {
+    transform: rotateY(180deg); /* Rotates the inner container when 'flipped' class is active */
+}
+
+.flip-card-inner.not-flipped {
+    transform: rotateY(0deg); /* Rotates the inner container when 'flipped' class is active */
+}
+
+.flip-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Hides the back of the element during the flip */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Контейнер для текста на рубашке */
+.back-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.back-content h5 {
+    font-family: 'Montserrat', sans-serif;
+    color: #2d7099;
+    font-size: 1.5em;
+    font-weight: 700;
+    text-shadow: 0 0 15px rgb(125, 227, 252);
+    margin: 5px 0;
+    line-height: 1.1;
+    word-break: break-word;
+}

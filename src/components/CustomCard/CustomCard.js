@@ -19,9 +19,7 @@ export default function CustomCard({backText, onCardClick}) {
     // --- Сброс карточки ---
     const handleReset = () => {
         setIsFlipped(false);
-        setTimeout(() => {
-            onCardClick();
-        }, 800); // Ждём окончания анимации переворота
+        onCardClick();
     };
 
     return (

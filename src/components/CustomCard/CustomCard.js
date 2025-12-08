@@ -1,39 +1,34 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Card, CardContent} from '@mui/material';
 import './CustomCard.css';
-import Button from "@mui/material/Button"; // Import your custom CSS
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-export default function CustomCard({backText, onCardClick}) {
-    const [isFlipped, setIsFlipped] = useState(false);
-    const [question, setQuestion] = useState("Нажмите на карту, чтобы получить свой вопрос.");
+export default function CustomCard({backText, isFlipped, handleCardClick}) {
 
-    // --- Обработчик клика на карточку ---
-    const handleCardClick = async () => {
-        if (isFlipped) return;
-        setQuestion(backText);
-        setIsFlipped(true);
-    };
+    const [question, setQuestion] = useState("...");
 
-    // --- Сброс карточки ---
-    const handleReset = () => {
-        setIsFlipped(false);
-        onCardClick();
-    };
+    useEffect(() => {
+        if(!isFlipped) {
+            setQuestion("...");
+            setTimeout(() => {
+                setQuestion(backText);
+            }, 800); // Ждём окончания анимации переворота
+        }
+    }, [isFlipped, backText])
 
     return (
         <Box className="flip-card-container" onClick={handleCardClick}>
             <Box className={`flip-card-inner  ${isFlipped ? "flipped" : "not-flipped"}`}
-                sx={{transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",}}
+                 sx={{transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",}}
             >
                 {/* FRONT SIDE */}
                 <Card className="flip-card"
-                    sx={{
-                        boxShadow: "0 8px 25px rgba(0,0,0,0.25)",
-                        borderRadius: 3,
-                        background: "linear-gradient(135deg, #ffffff, #f0f0f0)",
-                    }}
+                      sx={{
+                          boxShadow: "0 8px 25px rgba(0,0,0,0.25)",
+                          borderRadius: 3,
+                          background: "linear-gradient(135deg, #ffffff, #f0f0f0)",
+                      }}
                 >
                     <CardContent className="back-content">
                         <Typography variant="h5" align="center">
@@ -44,11 +39,12 @@ export default function CustomCard({backText, onCardClick}) {
 
                 {/* BACK SIDE */}
                 <Card className="flip-card"
-                    sx={{
-                        transform: "rotateY(180deg)",
-                        boxShadow: "0 8px 25px rgba(0,0,0,0.25)",
-                        background: "linear-gradient(135deg, #e7f1ff, #d0e4ff)",
-                    }}
+                      sx={{
+                          borderRadius: 3,
+                          transform: "rotateY(180deg)",
+                          boxShadow: "0 8px 25px rgba(0,0,0,0.25)",
+                          background: "linear-gradient(135deg, #e7f1ff, #d0e4ff)",
+                      }}
                 >
                     <CardContent>
                         <Typography variant="h6" align="center">
@@ -57,14 +53,6 @@ export default function CustomCard({backText, onCardClick}) {
                     </CardContent>
                 </Card>
             </Box>
-            <Button
-                variant="contained"
-                size="large"
-                sx={{borderRadius: 8, margin: 1}}
-                onClick={handleReset}
-            >
-                Сбросить / Новая карта
-            </Button>
         </Box>
     );
 };

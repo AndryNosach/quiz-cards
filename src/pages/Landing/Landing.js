@@ -92,7 +92,7 @@ function Landing() {
                         component={Link}
                         sx={{borderRadius: 8, margin: 1}}
                         onClick={() => checkError()}
-                        to={currentCategoryId ? '/cardQuestions/' + currentCategoryId : '#'}
+                        to="/edit"
                     >
                         Edit questions
                     </Button>

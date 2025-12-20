@@ -1,6 +1,10 @@
 
 .edit-page {
-    margin-top: -350px;
+    ont-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .button-box {
@@ -13,4 +17,29 @@
 
 .add-category-button {
     padding-top: 43px;
+    margin-left: 40px;
+}
+
+.category-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.category-edit {
+    margin-top: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-edit-field {
+    width: 310px;
+}
+
+.save-category-btn {
+    margin-left: 40px;
+}
+
+.divider {
+    width: 60%;
 }

@@ -1,12 +1,5 @@
 .App {
   text-align: center;
-  ont-family: 'Inter', sans-serif;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
   padding-top: 30px;
 }
 

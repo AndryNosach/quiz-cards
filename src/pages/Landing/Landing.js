@@ -46,7 +46,7 @@ function Landing() {
     );
 
     return (
-        <Box sx={{marginTop: -40}}>
+        <Box className="landing">
             <Box>
                 <CardMedia
                     component="img"
@@ -101,7 +101,7 @@ function Landing() {
             <Box sx={{marginTop: 5, width: 310}}>
                 <CategorySelect
                     categories={categories}
-                    onCategorySelect={id => onCategorySelect(id)}
+                    onCategorySelect={category => onCategorySelect(category.id)}
                 />
             </Box>
         </Box>

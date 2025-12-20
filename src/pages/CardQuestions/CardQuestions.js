@@ -11,10 +11,21 @@ function CardQuestions() {
     const {categoryId} = useParams();
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [isFlipped, setIsFlipped] = useState(false);
+    const [isFlipped, setIsFlipped] = useState(false)
+    const [backgroundImg, setBackgroundImg] = useState(null);
 
     const fetchQuestions = useCallback(async () => {
         const {data, error} = await supabase.from("questions").select("*").eq("category_id", categoryId);
+
+        if (error) {
+            console.error("Ошибка при получении вопросов:", error);
+        } else {
+            setQuestions(data);
+        }
+    }, [categoryId])
+
+    const fetchBackgroundImg = useCallback(async (imgUrl) => {
+        const {data, error} = await supabase.storage.from("assets").getPublicUrl();
 
         if (error) {
             console.error("Ошибка при получении вопросов:", error);

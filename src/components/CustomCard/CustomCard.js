@@ -3,6 +3,7 @@ import {Card, CardContent} from '@mui/material';
 import './CustomCard.css';
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import bgImage from "../../assets/images/dog.png";
 
 export default function CustomCard({backText, isFlipped, handleCardClick}) {
 
@@ -30,10 +31,17 @@ export default function CustomCard({backText, isFlipped, handleCardClick}) {
                           background: "linear-gradient(135deg, #ffffff, #f0f0f0)",
                       }}
                 >
-                    <CardContent className="back-content">
-                        <Typography variant="h5" align="center">
-                            Перевернуть
-                        </Typography>
+                    <CardContent className="back-content"
+                                 sx={{
+                                     backgroundImage: `url(${bgImage})`,
+                                     backgroundSize: "cover",
+                                     backgroundPosition: "center",
+                                     minHeight: 200,
+                                 }}
+                    >
+                        {/*<Typography variant="h5" align="center">*/}
+                        {/*    Перевернуть*/}
+                        {/*</Typography>*/}
                     </CardContent>
                 </Card>
 

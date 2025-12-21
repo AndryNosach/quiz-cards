@@ -3,9 +3,9 @@ import {Card, CardContent} from '@mui/material';
 import './CustomCard.css';
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import bgImage from "../../assets/images/dog.png";
+import bgImage from "../../assets/images/default.png";
 
-export default function CustomCard({backText, isFlipped, handleCardClick}) {
+export default function CustomCard({backText, imgUrl, isFlipped, handleCardClick}) {
 
     const [question, setQuestion] = useState("...");
 
@@ -33,7 +33,7 @@ export default function CustomCard({backText, isFlipped, handleCardClick}) {
                 >
                     <CardContent className="back-content"
                                  sx={{
-                                     backgroundImage: `url(${bgImage})`,
+                                     backgroundImage: `url(${imgUrl || bgImage})`,
                                      backgroundSize: "cover",
                                      backgroundPosition: "center",
                                      minHeight: 200,

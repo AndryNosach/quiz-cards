@@ -1,0 +1,7 @@
+.question-btn-container {
+    display: flex;
+}
+
+.question-btn-cell {
+    width: 60px;
+}

@@ -12,7 +12,7 @@ function CardQuestions() {
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false)
-    const [backgroundImg, setBackgroundImg] = useState(null);
+    const [imgUrl, setImgUrl] = useState(null);
 
     const fetchQuestions = useCallback(async () => {
         const {data, error} = await supabase.from("questions").select("*").eq("category_id", categoryId);
@@ -24,13 +24,13 @@ function CardQuestions() {
         }
     }, [categoryId])
 
-    const fetchBackgroundImg = useCallback(async (imgUrl) => {
-        const {data, error} = await supabase.storage.from("assets").getPublicUrl();
+    const fetchBackgroundImg = useCallback(async () => {
+        const {data, error} = await supabase.from("categories").select("img_url").eq("id", categoryId);
 
         if (error) {
             console.error("Ошибка при получении вопросов:", error);
-        } else {
-            setQuestions(data);
+        } else if (data && data[0] && data[0].img_url) {
+            setImgUrl(data[0].img_url);
         }
     }, [categoryId])
 
@@ -38,6 +38,7 @@ function CardQuestions() {
         console.log("fetch categories")
         if (categoryId) {
             fetchQuestions();
+            fetchBackgroundImg();
         }
     }, [categoryId, fetchQuestions]);
 
@@ -60,10 +61,11 @@ function CardQuestions() {
     if (questions.length === 0) return <p>Загрузка вопросов...</p>;
 
     return (
-        <Box>
+        <Box className="card-game">
             <Box>
                 <CustomCard
                     backText={questions[currentIndex].question}
+                    imgUrl={imgUrl}
                     isFlipped={isFlipped}
                     handleCardClick={handleCardClick}
                 />

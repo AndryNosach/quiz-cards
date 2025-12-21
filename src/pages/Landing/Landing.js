@@ -15,7 +15,6 @@ function Landing() {
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-        console.log("fetch categories")
         fetchCategories();
     }, []);
 
@@ -58,6 +57,7 @@ function Landing() {
             </Box>
             <Box sx={{
                 marginTop: 2,
+                marginBottom: 2,
                 height: 50
             }}>
                 {errorMessage && (

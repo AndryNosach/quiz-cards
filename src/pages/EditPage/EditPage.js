@@ -20,7 +20,6 @@ function EditPage() {
     const [categories, setCategories] = useState([]);
     const [currentCategory, setCurrentCategory] = useState(null);
     const [categoryName, setCategoryName] = useState(null);
-    const [updatedCategory, setUpdatedCategory] = useState(null);
 
     useEffect(() => {
         console.log("fetch categories")
@@ -61,13 +60,19 @@ function EditPage() {
 
     const saveCategory = async () => {
         if (currentCategory && currentCategory.id) {
+            const nameChanged = categories.find(el => (el.id == currentCategory.id && el.name != categoryName));
+            if (!nameChanged) {
+                return;
+            }
             var {data, error} = await supabase.from("categories").update({name: categoryName}).eq("id", currentCategory.id).select('*');
             if (data) {
+                const updateCat = {...data[0], questions: currentCategory.questions};
                 setCategories(prev =>
                     prev.map(cat =>
-                        cat.id === currentCategory.id ? data[0] : cat
+                        cat.id === currentCategory.id ? updateCat : cat
                     )
                 );
+                setCurrentCategory(updateCat);
             }
         } else {
             var {data, error} = await supabase.from("categories").insert([{name: categoryName}]).select("*");
@@ -75,19 +80,20 @@ function EditPage() {
                 setCategories(prev =>
                     [...prev, data[0]]
                 );
+                setCurrentCategory(data[0]);
             }
         }
         if (error) {
             console.error("Ошибка при получении вопросов:", error);
         } else if (data) {
-            setUpdatedCategory(data[0]);
             setErrorMessage(null);
         }
     };
 
     const removeCategory = async () => {
         if (currentCategory && currentCategory.id) {
-            if (!!currentCategory.questions && currentCategory.questions.length > 0) {
+            if (!!currentCategory.questions &&
+                (currentCategory.questions.length > 0 && !(currentCategory.questions.length == 1 && currentCategory.questions[0].id == 0))) {
                 setErrorMessage("Есть вопросы в категории!!!");
                 return;
             }
@@ -99,7 +105,6 @@ function EditPage() {
             setCategories(categories.filter(category => category.id !== currentCategory.id));
             if (categories) {
                 setCurrentCategory(categories[0]);
-                setUpdatedCategory(categories[0]);
                 setCategoryName(categories[0].name);
             }
             setErrorMessage(null);
@@ -118,14 +123,14 @@ function EditPage() {
                 <Box
                     sx={{
                         display: "flex",
-                        justifyContent: "center", // по центру
+                        justifyContent: "center",
                     }}
                 >
                     <Box sx={{marginTop: 5, width: 310}}>
                         <CategorySelect
                             categories={categories}
                             onCategorySelect={category => onCategorySelect(category)}
-                            currentCategory={updatedCategory}
+                            currentCategory={currentCategory}
                         />
                     </Box>
                     <Box className="add-category-button">

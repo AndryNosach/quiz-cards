@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './EditQuestions.css';
 import Box from "@mui/material/Box";
+import DeleteIcon from '@mui/icons-material/Delete';
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -20,14 +21,24 @@ import {supabase} from "../../api/SupabaseClient";
 function EditQuestions({currentCategory}) {
 
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
     const [questions, setQuestions] = useState([]);
 
+    const emptyQuestion = {id: 0, question: '', edit: false};
+
     useEffect(() => {
-        if (currentCategory && currentCategory.questions) {
-            setQuestions([ {id: 0, question: '', edit: false}, ...currentCategory.questions.map((el) => {
-                return {...el, edit: false}
-            })]);
+        if (currentCategory) {
+            if (currentCategory.questions) {
+                const array = [emptyQuestion, ...currentCategory.questions.map((el) => {
+                    return {...el, edit: false}
+                })];
+                array.sort((a, b) => a.id - b.id);
+                setQuestions(array);
+            } else if (currentCategory.id) {
+                setQuestions([emptyQuestion]);
+            } else {
+                setQuestions([])
+            }
         }
     }, [currentCategory])
 
@@ -52,24 +63,41 @@ function EditQuestions({currentCategory}) {
     }
 
     const saveNewValue = async (question) => {
-        console.log(question);
+        console.log('save', question);
         if (question.id == 0) {
             if (!question.question) {
                 setQuestions(prev => prev.map(el => ({...el, edit: false})));
                 return;
             }
-            await supabase.from("questions").insert({question: question.question, category_id: currentCategory.id}).select();
-            setQuestions(prev => prev.map(el => ({...el, edit: false})));
+            const savedData = await supabase.from("questions").insert({
+                question: question.question,
+                category_id: currentCategory.id
+            }).select();
+            questions.forEach(el => {
+                if (el.id === question.id) {
+                    el.id = savedData.data[0].id;
+                }
+            });
+            questions.sort((a, b) => a.id - b.id);
             currentCategory.questions = questions;
+            setQuestions(prev => [emptyQuestion, ...prev.map(el => ({...el, edit: false}))]);
             return;
         }
         const prevQuestion = currentCategory.questions.find(el => el.id == question.id);
         if (prevQuestion.question !== question.question) {
-            console.log('update');
             await supabase.from("questions").update({question: question.question}).eq('id', question.id);
             currentCategory.questions = questions;
         }
         setQuestions(prev => prev.map(el => ({...el, edit: false})));
+    }
+
+    const onRemove = async (question) => {
+        console.log('remove', question);
+        await supabase.from("questions").delete().eq('id', question.id);
+        const filtered = questions.filter(el => el.id !== question.id);
+        console.log(filtered);
+        setQuestions(filtered);
+        currentCategory.questions = filtered;
     }
 
     return (
@@ -81,7 +109,7 @@ function EditQuestions({currentCategory}) {
                         <TableHead sx={{backgroundColor: '#e9e9e9'}}>
                             <TableRow>
                                 <TableCell sx={{fontWeight: "bold"}}>Вопрос</TableCell>
-                                <TableCell />
+                                <TableCell/>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -97,8 +125,10 @@ function EditQuestions({currentCategory}) {
                                                 fullWidth
                                                 value={row.question}
                                                 onChange={(e) => setTempValue(e.target.value, row.id)}
-                                                onBlur={() => {}}
-                                                onKeyDown={() => {}}
+                                                onBlur={() => {
+                                                }}
+                                                onKeyDown={() => {
+                                                }}
                                                 variant="outlined"
                                                 size="small"
                                                 sx={{
@@ -116,15 +146,30 @@ function EditQuestions({currentCategory}) {
                                     </TableRow>
                                     :
                                     <TableRow key={row.question}>
-                                        <TableCell component="th" scope="row">
+                                        <TableCell scope="row" width="60px;">
                                             {row.question}
                                         </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            <Edit
-                                                fontSize="small"
-                                                sx={{ cursor: 'pointer' }}
-                                                onClick={() => handleCellClick(row.id)}
-                                            />
+                                        <TableCell scope="row" width="10%">
+                                            <Box className="question-btn-container">
+                                                <Box  sx={{alignContent: 'end'}}>
+                                                    <Edit
+                                                        fontSize="small"
+                                                        sx={{cursor: 'pointer'}}
+                                                        onClick={() => handleCellClick(row.id)}
+                                                    />
+                                                </Box>
+                                                {row.id > 0 &&
+                                                    <Box sx={{marginLeft: 2}}>
+                                                        <IconButton color="error">
+                                                            <DeleteIcon
+                                                                fontSize="small"
+                                                                sx={{cursor: 'pointer'}}
+                                                                onClick={() => onRemove(row)}
+                                                            />
+                                                        </IconButton>
+                                                    </Box>
+                                                }
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
 

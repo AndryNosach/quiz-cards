@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/quiz-cards/static/css/main.a89f657e.css",
-    "main.js": "/quiz-cards/static/js/main.92745d11.js",
+    "main.css": "/quiz-cards/static/css/main.06cf6170.css",
+    "main.js": "/quiz-cards/static/js/main.9479cd4f.js",
     "static/js/453.e3353a03.chunk.js": "/quiz-cards/static/js/453.e3353a03.chunk.js",
     "static/media/question.png": "/quiz-cards/static/media/question.1e6ca426167ff11ae438.png",
     "static/media/default.png": "/quiz-cards/static/media/default.5e5f4bdb3e5b64760c83.png",
     "index.html": "/quiz-cards/index.html",
-    "main.a89f657e.css.map": "/quiz-cards/static/css/main.a89f657e.css.map",
-    "main.92745d11.js.map": "/quiz-cards/static/js/main.92745d11.js.map",
+    "main.06cf6170.css.map": "/quiz-cards/static/css/main.06cf6170.css.map",
+    "main.9479cd4f.js.map": "/quiz-cards/static/js/main.9479cd4f.js.map",
     "453.e3353a03.chunk.js.map": "/quiz-cards/static/js/453.e3353a03.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a89f657e.css",
-    "static/js/main.92745d11.js"
+    "static/css/main.06cf6170.css",
+    "static/js/main.9479cd4f.js"
   ]
 }

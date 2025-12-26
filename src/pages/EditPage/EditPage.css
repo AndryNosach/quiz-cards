@@ -1,5 +1,6 @@
 
 .edit-page {
+    margin-top: -30px;
     ont-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
@@ -16,6 +17,7 @@
 }
 
 .add-category-button {
+    min-width: 100px;
     padding-top: 43px;
     margin-left: 40px;
 }
@@ -37,9 +39,42 @@
 }
 
 .save-category-btn {
+    display: flex;
     margin-left: 40px;
 }
 
 .divider {
     width: 60%;
+}
+
+@media (max-width: 400px) {
+
+    .edit-page {
+        max-width: 350px;
+    }
+
+    .category-content {
+        margin-left: 10px;
+    }
+
+    .category-select-box {
+        width: 220px !important;
+    }
+
+    .category-edit-field {
+        width: 220px;
+    }
+
+    .add-category-button {
+        margin-left: 10px;
+    }
+
+    .save-category-btn {
+        display: flex;
+        margin-left: 10px;
+    }
+
+    .divider {
+        width: 40%;
+    }
 }

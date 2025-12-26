@@ -1,7 +1,21 @@
+.edit-questions-box {
+    width: 700px;
+}
+
 .question-btn-container {
     display: flex;
 }
 
 .question-btn-cell {
     width: 60px;
+}
+
+@media (max-width: 400px) {
+    .edit-questions-box {
+        width: 350px;
+    }
+
+    .edit-questions-table {
+        width: 300px;
+    }
 }

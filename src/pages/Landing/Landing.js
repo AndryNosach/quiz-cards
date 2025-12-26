@@ -91,7 +91,6 @@ function Landing() {
                         color="primary"
                         component={Link}
                         sx={{borderRadius: 8, margin: 1}}
-                        onClick={() => checkError()}
                         to="/edit"
                     >
                         Edit questions

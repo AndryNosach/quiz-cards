@@ -10,16 +10,20 @@ import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SaveIcon from "@mui/icons-material/Save";
+import ImageIcon from '@mui/icons-material/Image';
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 import EditQuestions from "../EditQuestions/EditQuestions";
+import ImageUpload from "../ImageUpload/ImageUpload";
 
 function EditPage() {
     const [errorMessage, setErrorMessage] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [categories, setCategories] = useState([]);
     const [currentCategory, setCurrentCategory] = useState(null);
     const [categoryName, setCategoryName] = useState(null);
+    const [uploadDialog, setUploadDialog] = useState(false);
 
     useEffect(() => {
         console.log("fetch categories")
@@ -54,11 +58,13 @@ function EditPage() {
     };
 
     const onCategorySelect = (category) => {
+        clearMessages();
         setCurrentCategory(category);
         setCategoryName(category.name);
     };
 
     const saveCategory = async () => {
+        clearMessages();
         if (currentCategory && currentCategory.id) {
             const nameChanged = categories.find(el => (el.id == currentCategory.id && el.name != categoryName));
             if (!nameChanged) {
@@ -87,14 +93,17 @@ function EditPage() {
             console.error("Ошибка при получении вопросов:", error);
         } else if (data) {
             setErrorMessage(null);
+            setSuccessMessage(null);
         }
     };
 
     const removeCategory = async () => {
+        clearMessages();
         if (currentCategory && currentCategory.id) {
             if (!!currentCategory.questions &&
                 (currentCategory.questions.length > 0 && !(currentCategory.questions.length == 1 && currentCategory.questions[0].id == 0))) {
                 setErrorMessage("Есть вопросы в категории!!!");
+                setSuccessMessage(null);
                 return;
             }
             var {data, error} = await supabase.from("categories").delete().eq("id", currentCategory.id);
@@ -107,16 +116,37 @@ function EditPage() {
                 setCurrentCategory(categories[0]);
                 setCategoryName(categories[0].name);
             }
-            setErrorMessage(null);
         }
     };
 
+    const uploadImage = async (file) => {
+        clearMessages();
+        const path = file.name;
+        var {error} = await supabase.storage.
+                                from("assets").
+                                upload(path, file, {upsert: true, cacheControl: '3600',});
+        if (error) {
+            setErrorMessage("Ошибка загрузки файла!!!")
+        };
+        var url = await supabase.storage.from('assets').getPublicUrl(path);
+        if (url && url.data && url.data.publicUrl) {
+           var {error} = await supabase.from("categories").update({img_url: url.data.publicUrl}).eq("id", currentCategory.id).select('*');
+            if (!error) {
+                setSuccessMessage("Изображение загружено!");
+            }
+        }
+    }
+
+    const clearMessages = () => {
+        setErrorMessage(null);
+        setSuccessMessage(null);
+    };
 
     return (
         <Box className="edit-page">
-            <Box sx={{visibility: !!errorMessage ? '' : 'hidden'}}>
-                <Alert severity="error" sx={{mt: 2}}>
-                    {errorMessage}
+            <Box sx={{visibility: !!errorMessage || !!successMessage ? '' : 'hidden'}}>
+                <Alert severity={errorMessage ? "error" : "success"} sx={{mt: 2}}>
+                    {errorMessage ? errorMessage : successMessage}
                 </Alert>
             </Box>
             <Box className="category-content">
@@ -126,7 +156,7 @@ function EditPage() {
                         justifyContent: "center",
                     }}
                 >
-                    <Box sx={{marginTop: 5, width: 310}}>
+                    <Box className="category-select-box" sx={{marginTop: 5, width: 310}}>
                         <CategorySelect
                             categories={categories}
                             onCategorySelect={category => onCategorySelect(category)}
@@ -168,6 +198,16 @@ function EditPage() {
                         <IconButton color="success" onClick={() => saveCategory()}>
                             <SaveIcon fontSize="large"/>
                         </IconButton>
+                        <IconButton onClick={() => setUploadDialog(true)}>
+                            <ImageIcon fontSize="large" />
+                        </IconButton>
+                    </Box>
+                    <Box>
+                     <ImageUpload
+                        open={uploadDialog}
+                        onSave={uploadImage}
+                        onClose={() => setUploadDialog(false)}
+                     />
                     </Box>
                 </Box>
             </Box>

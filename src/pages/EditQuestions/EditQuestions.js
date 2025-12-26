@@ -17,6 +17,7 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
 import {supabase} from "../../api/SupabaseClient";
+import Typography from "@mui/material/Typography";
 
 function EditQuestions({currentCategory}) {
 
@@ -101,11 +102,11 @@ function EditQuestions({currentCategory}) {
     }
 
     return (
-        <Box>
+        <Box className="edit-questions-box">
             {questions && questions.length > 0 &&
-            <Box>
+            <Box className="edit-questions-table">
                 <TableContainer component={Paper}>
-                    <Table sx={{minWidth: 500}} aria-label="custom pagination table">
+                    <Table  aria-label="custom pagination table">
                         <TableHead sx={{backgroundColor: '#e9e9e9'}}>
                             <TableRow>
                                 <TableCell sx={{fontWeight: "bold"}}>Вопрос</TableCell>
@@ -125,8 +126,6 @@ function EditQuestions({currentCategory}) {
                                                 fullWidth
                                                 value={row.question}
                                                 onChange={(e) => setTempValue(e.target.value, row.id)}
-                                                onBlur={() => {
-                                                }}
                                                 onKeyDown={() => {
                                                 }}
                                                 variant="outlined"
@@ -147,7 +146,13 @@ function EditQuestions({currentCategory}) {
                                     :
                                     <TableRow key={row.question}>
                                         <TableCell scope="row" width="60px;">
-                                            {row.question}
+                                            <Typography
+                                                sx={{
+                                                    color: 'primary.main',
+                                                }}
+                                            >
+                                                {row.question}
+                                            </Typography>
                                         </TableCell>
                                         <TableCell scope="row" width="10%">
                                             <Box className="question-btn-container">

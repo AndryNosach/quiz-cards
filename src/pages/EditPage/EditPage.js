@@ -122,15 +122,14 @@ function EditPage() {
     const uploadImage = async (file) => {
         clearMessages();
         const path = file.name;
-        var {error} = await supabase.storage.
-                                from("assets").
-                                upload(path, file, {upsert: true, cacheControl: '3600',});
+        var {error} = await supabase.storage.from("assets").upload(path, file, {upsert: true, cacheControl: '3600',});
         if (error) {
             setErrorMessage("Ошибка загрузки файла!!!")
-        };
+        }
+        ;
         var url = await supabase.storage.from('assets').getPublicUrl(path);
         if (url && url.data && url.data.publicUrl) {
-           var {error} = await supabase.from("categories").update({img_url: url.data.publicUrl}).eq("id", currentCategory.id).select('*');
+            var {error} = await supabase.from("categories").update({img_url: url.data.publicUrl}).eq("id", currentCategory.id).select('*');
             if (!error) {
                 setSuccessMessage("Изображение загружено!");
             }
@@ -144,95 +143,97 @@ function EditPage() {
 
     return (
         <Box className="edit-page">
-            <Box sx={{visibility: !!errorMessage || !!successMessage ? '' : 'hidden'}}>
-                <Alert severity={errorMessage ? "error" : "success"} sx={{mt: 2}}>
-                    {errorMessage ? errorMessage : successMessage}
-                </Alert>
-            </Box>
-            <Box className="category-content">
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Box className="category-select-box" sx={{marginTop: 5, width: 310}}>
-                        <CategorySelect
-                            categories={categories}
-                            onCategorySelect={category => onCategorySelect(category)}
-                            currentCategory={currentCategory}
-                        />
+            <Box className="edit-page-content">
+                <Box sx={{visibility: !!errorMessage || !!successMessage ? '' : 'hidden'}}>
+                    <Alert severity={errorMessage ? "error" : "success"} sx={{mt: 2}}>
+                        {errorMessage ? errorMessage : successMessage}
+                    </Alert>
+                </Box>
+                <Box className="category-content">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Box className="category-select-box" sx={{marginTop: 5, width: 310}}>
+                            <CategorySelect
+                                categories={categories}
+                                onCategorySelect={category => onCategorySelect(category)}
+                                currentCategory={currentCategory}
+                            />
+                        </Box>
+                        <Box className="add-category-button">
+                            <Fab color="success" size="small" aria-label="add"
+                                 onClick={() => {
+                                     setCurrentCategory({name: ""});
+                                     setCategoryName("");
+                                 }}>
+                                <AddIcon/>
+                            </Fab>
+                            <Fab color="error" size="small" aria-label="remove"
+                                 sx={{marginLeft: 2}}
+                                 onClick={() => {
+                                     removeCategory()
+                                 }}
+                            >
+                                <RemoveIcon/>
+                            </Fab>
+                        </Box>
                     </Box>
-                    <Box className="add-category-button">
-                        <Fab color="success" size="small" aria-label="add"
-                             onClick={() => {
-                                 setCurrentCategory({name: ""});
-                                 setCategoryName("");
-                             }}>
-                            <AddIcon/>
-                        </Fab>
-                        <Fab color="error" size="small" aria-label="remove"
-                             sx={{marginLeft: 2}}
-                             onClick={() => {
-                                 removeCategory()
-                             }}
-                        >
-                            <RemoveIcon/>
-                        </Fab>
+                    <Box className="category-edit"
+                         sx={{
+                             display: currentCategory ? "flex" : "none",
+                         }}
+                    >
+                        <Box className="category-edit-field">
+                            <TextField
+                                label="Category name"
+                                value={categoryName ? categoryName : ''}
+                                onChange={(e) => setCategoryName(e.target.value)}
+                                fullWidth
+                            />
+                        </Box>
+                        <Box className="save-category-btn">
+                            <IconButton color="success" onClick={() => saveCategory()}>
+                                <SaveIcon fontSize="large"/>
+                            </IconButton>
+                            <IconButton onClick={() => setUploadDialog(true)}>
+                                <ImageIcon fontSize="large"/>
+                            </IconButton>
+                        </Box>
+                        <Box>
+                            <ImageUpload
+                                open={uploadDialog}
+                                onSave={uploadImage}
+                                onClose={() => setUploadDialog(false)}
+                            />
+                        </Box>
                     </Box>
                 </Box>
-                <Box className="category-edit"
-                     sx={{
-                         display: currentCategory ? "flex" : "none",
-                     }}
-                >
-                    <Box className="category-edit-field">
-                        <TextField
-                            label="Category name"
-                            value={categoryName ? categoryName : ''}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            fullWidth
-                        />
-                    </Box>
-                    <Box className="save-category-btn">
-                        <IconButton color="success" onClick={() => saveCategory()}>
-                            <SaveIcon fontSize="large"/>
-                        </IconButton>
-                        <IconButton onClick={() => setUploadDialog(true)}>
-                            <ImageIcon fontSize="large" />
-                        </IconButton>
-                    </Box>
-                    <Box>
-                     <ImageUpload
-                        open={uploadDialog}
-                        onSave={uploadImage}
-                        onClose={() => setUploadDialog(false)}
-                     />
-                    </Box>
+                <Box className="divider">
+                    <Divider
+                        sx={{
+                            my: 2,
+                            borderBottomWidth: 3, // толщина линии
+                            borderColor: "grey.400",
+                        }}
+                    />
                 </Box>
-            </Box>
-            <Box className="divider">
-                <Divider
-                    sx={{
-                        my: 2,
-                        borderBottomWidth: 3, // толщина линии
-                        borderColor: "grey.400",
-                    }}
-                />
-            </Box>
-            <Box>
-                <EditQuestions currentCategory={currentCategory}/>
-            </Box>
-            <Box>
-                <Button
-                    className="action-button"
-                    variant="contained"
-                    size="large"
-                    sx={{borderRadius: 8, margin: 1}}
-                    component={Link}
-                    to="/">
-                    Выйти
-                </Button>
+                <Box>
+                    <EditQuestions currentCategory={currentCategory}/>
+                </Box>
+                <Box>
+                    <Button
+                        className="action-button"
+                        variant="contained"
+                        size="large"
+                        sx={{borderRadius: 8, margin: 1}}
+                        component={Link}
+                        to="/">
+                        Выйти
+                    </Button>
+                </Box>
             </Box>
         </Box>
     )

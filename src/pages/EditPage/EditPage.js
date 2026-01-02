@@ -71,6 +71,10 @@ function EditPage() {
     }
 
     const saveCategory = async () => {
+        if (!categoryName || !categoryName.ua || !categoryName.ru || !categoryName.de || !categoryName.en) {
+            setErrorMessage(translator("noCatName"));
+            return;
+        }
         clearMessages();
         if (currentCategory && currentCategory.id) {
             const nameChanged = categories.find(el => (el.id == currentCategory.id && categoryName &&

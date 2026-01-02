@@ -6,6 +6,7 @@ const ua = {
     loading: "Завантаження...",
     selectCategory: "Оберіть категорію",
     exit: "Вийти",
+    noCatName: "Не введено ім'я категорії!!!",
 };
 
 export default ua;

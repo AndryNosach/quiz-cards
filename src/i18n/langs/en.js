@@ -6,6 +6,7 @@ const en = {
     loading: "Loading...",
     selectCategory: "Select category",
     exit: "Exit",
+    noCatName: "No category name entered!!!",
 };
 
 export default en;

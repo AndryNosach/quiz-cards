@@ -6,6 +6,7 @@ const ru = {
     loading: "Загрузка...",
     selectCategory: "Выберите категорию",
     exit: "Выйти",
+    noCatName: "Не введено имя категории!!!",
 };
 
 export default ru;

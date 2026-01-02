@@ -42,7 +42,14 @@
     justify-content: center;
 }
 
+.category-names-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 .category-edit-field {
+    margin-top: 8px;
     width: 310px;
 }
 

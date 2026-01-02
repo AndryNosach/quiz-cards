@@ -8,11 +8,14 @@ import questionPng from "../../assets/images/question.png";
 import CategorySelect from "../../components/CategorySelect/CategorySelect";
 import {supabase} from "../../api/SupabaseClient";
 import Alert from "@mui/material/Alert";
+import {useTranslate} from "../../hooks/useTranslate";
 
 function Landing() {
     const [categories, setCategories] = useState([]);
     const [currentCategoryId, setCurrentCategoryId] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
+
+    const translator = useTranslate();
 
     useEffect(() => {
         fetchCategories();
@@ -34,7 +37,7 @@ function Landing() {
 
     const checkError = () => {
         if (!currentCategoryId) {
-         setErrorMessage("Выберите категорию!!!")
+            setErrorMessage("Выберите категорию!!!")
         }
     };
 
@@ -47,13 +50,15 @@ function Landing() {
     return (
         <Box className="landing">
             <Box>
-                <CardMedia
-                    component="img"
-                    height="200"
-                    width="1000"
-                    src={questionPng}
-                    alt="My Image"
-                />
+                <Box>
+                    <CardMedia
+                        component="img"
+                        height="200"
+                        width="1000"
+                        src={questionPng}
+                        alt="My Image"
+                    />
+                </Box>
             </Box>
             <Box sx={{
                 marginTop: 2,
@@ -61,7 +66,7 @@ function Landing() {
                 height: 50
             }}>
                 {errorMessage && (
-                    <Alert severity="error" sx={{ mt: 2 }}>
+                    <Alert severity="error" sx={{mt: 2}}>
                         {errorMessage}
                     </Alert>
                 )}
@@ -82,7 +87,7 @@ function Landing() {
                         onClick={() => checkError()}
                         to={currentCategoryId ? '/cardQuestions/' + currentCategoryId : '#'}
                     >
-                        New game
+                        {translator("newGame")}
                     </Button>
                 </Box>
                 <Box>
@@ -93,7 +98,7 @@ function Landing() {
                         sx={{borderRadius: 8, margin: 1}}
                         to="/edit"
                     >
-                        Edit questions
+                        {translator("edit")}
                     </Button>
                 </Box>
             </Box>

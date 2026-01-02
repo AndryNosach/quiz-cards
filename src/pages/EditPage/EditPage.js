@@ -16,6 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 import EditQuestions from "../EditQuestions/EditQuestions";
 import ImageUpload from "../ImageUpload/ImageUpload";
+import {useTranslate} from "../../hooks/useTranslate";
 
 function EditPage() {
     const [errorMessage, setErrorMessage] = useState(null);
@@ -24,6 +25,8 @@ function EditPage() {
     const [currentCategory, setCurrentCategory] = useState(null);
     const [categoryName, setCategoryName] = useState(null);
     const [uploadDialog, setUploadDialog] = useState(false);
+
+    const translator = useTranslate();
 
     useEffect(() => {
         console.log("fetch categories")
@@ -60,17 +63,29 @@ function EditPage() {
     const onCategorySelect = (category) => {
         clearMessages();
         setCurrentCategory(category);
-        setCategoryName(category.name);
+        setCategoryName(nameFromCategory(category));
     };
+
+    const nameFromCategory = (category) => {
+        return {ua: category.name_ua, ru: category.name_ru, de: category.name_de, en: category.name_en};
+    }
 
     const saveCategory = async () => {
         clearMessages();
         if (currentCategory && currentCategory.id) {
-            const nameChanged = categories.find(el => (el.id == currentCategory.id && el.name != categoryName));
+            const nameChanged = categories.find(el => (el.id == currentCategory.id && categoryName &&
+                (el.name_ua != categoryName.ua || el.name_ru != categoryName.ru || el.name_en != categoryName.en || el.name_de != categoryName.de)));
             if (!nameChanged) {
                 return;
             }
-            var {data, error} = await supabase.from("categories").update({name: categoryName}).eq("id", currentCategory.id).select('*');
+            var {data, error} = await supabase.from("categories").update(
+                {
+                    name_ua: categoryName.ua,
+                    name_ru: categoryName.ru,
+                    name_en: categoryName.en,
+                    name_de: categoryName.de,
+                }
+            ).eq("id", currentCategory.id).select('*');
             if (data) {
                 const updateCat = {...data[0], questions: currentCategory.questions};
                 setCategories(prev =>
@@ -81,7 +96,14 @@ function EditPage() {
                 setCurrentCategory(updateCat);
             }
         } else {
-            var {data, error} = await supabase.from("categories").insert([{name: categoryName}]).select("*");
+            var {data, error} = await supabase.from("categories").insert([
+                {
+                    name_ua: categoryName.ua,
+                    name_ru: categoryName.ru,
+                    name_en: categoryName.en,
+                    name_de: categoryName.de,
+                }
+            ]).select("*");
             if (data) {
                 setCategories(prev =>
                     [...prev, data[0]]
@@ -114,7 +136,7 @@ function EditPage() {
             setCategories(categories.filter(category => category.id !== currentCategory.id));
             if (categories) {
                 setCurrentCategory(categories[0]);
-                setCategoryName(categories[0].name);
+                setCategoryName(nameFromCategory(categories[0]));
             }
         }
     };
@@ -167,15 +189,13 @@ function EditPage() {
                             <Fab color="success" size="small" aria-label="add"
                                  onClick={() => {
                                      setCurrentCategory({name: ""});
-                                     setCategoryName("");
+                                     setCategoryName({ua: "", en: "", ru: "", de: ""});
                                  }}>
                                 <AddIcon/>
                             </Fab>
                             <Fab color="error" size="small" aria-label="remove"
                                  sx={{marginLeft: 2}}
-                                 onClick={() => {
-                                     removeCategory()
-                                 }}
+                                 onClick={() => removeCategory()}
                             >
                                 <RemoveIcon/>
                             </Fab>
@@ -186,13 +206,39 @@ function EditPage() {
                              display: currentCategory ? "flex" : "none",
                          }}
                     >
-                        <Box className="category-edit-field">
-                            <TextField
-                                label="Category name"
-                                value={categoryName ? categoryName : ''}
-                                onChange={(e) => setCategoryName(e.target.value)}
-                                fullWidth
-                            />
+                        <Box className="category-names-edit">
+                            <Box className="category-edit-field">
+                                <TextField
+                                    label="Category name UA"
+                                    value={categoryName ? categoryName.ua : ''}
+                                    onChange={(e) => setCategoryName(prev => ({...prev, ua: e.target.value}))}
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box className="category-edit-field">
+                                <TextField
+                                    label="Category name RU"
+                                    value={categoryName ? categoryName.ru : ''}
+                                    onChange={(e) => setCategoryName(prev => ({...prev, ru: e.target.value}))}
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box className="category-edit-field">
+                                <TextField
+                                    label="Category name English"
+                                    value={categoryName ? categoryName.en : ''}
+                                    onChange={(e) => setCategoryName(prev => ({...prev, en: e.target.value}))}
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box className="category-edit-field">
+                                <TextField
+                                    label="Category name German"
+                                    value={categoryName ? categoryName.de : ''}
+                                    onChange={(e) => setCategoryName(prev => ({...prev, de: e.target.value}))}
+                                    fullWidth
+                                />
+                            </Box>
                         </Box>
                         <Box className="save-category-btn">
                             <IconButton color="success" onClick={() => saveCategory()}>
@@ -231,7 +277,7 @@ function EditPage() {
                         sx={{borderRadius: 8, margin: 1}}
                         component={Link}
                         to="/">
-                        Выйти
+                        {translator("exit")}
                     </Button>
                 </Box>
             </Box>

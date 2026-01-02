@@ -5,9 +5,14 @@ import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import {useSelector} from "react-redux";
 
 function CategorySelect({categories, onCategorySelect, currentCategory}) {
     const [category, setCategory] = useState({});
+
+    const lang = useSelector(state => state.language.lang);
+    const name = `name_${lang}`;
+
 
     useEffect(() => {
         if (currentCategory) {
@@ -32,7 +37,7 @@ function CategorySelect({categories, onCategorySelect, currentCategory}) {
                     onChange={handleChange}
                 >
                     {categories.map((item) => (
-                        <MenuItem value={item}>{item.name}</MenuItem>
+                        <MenuItem value={item}>{item[name]}</MenuItem>
                         ))
                     }
                 </Select>

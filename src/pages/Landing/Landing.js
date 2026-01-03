@@ -63,13 +63,22 @@ function Landing() {
             <Box sx={{
                 marginTop: 2,
                 marginBottom: 2,
-                height: 50
+                height: 'fit-content',
+                display: 'flex',
+                justifyContent: 'center'
             }}>
-                {errorMessage && (
-                    <Alert severity="error" sx={{mt: 2}}>
-                        {errorMessage}
-                    </Alert>
-                )}
+
+                    {errorMessage && (
+                        <Alert severity="error" sx={{mt: 2}}>
+                            {errorMessage}
+                        </Alert>
+                    )}
+                    {!errorMessage && (
+                            <Alert severity="success" sx={{mt: 2, width: '80%'}}>
+                                {translator("cardRules")}
+                            </Alert>
+                    )}
+
             </Box>
             <Box sx={{
                 display: "flex",

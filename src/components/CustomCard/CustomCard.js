@@ -4,19 +4,27 @@ import './CustomCard.css';
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import bgImage from "../../assets/images/default.png";
+import {useSelector} from "react-redux";
 
 export default function CustomCard({backText, imgUrl, isFlipped, handleCardClick}) {
 
     const [question, setQuestion] = useState("...");
+    let lang = useSelector((state) => state.language.lang);
 
     useEffect(() => {
-        if(!isFlipped) {
+        if (!isFlipped && lang) {
             setQuestion("...");
             setTimeout(() => {
-                setQuestion(backText);
+                setQuestion(backText[lang]);
             }, 800); // Ждём окончания анимации переворота
         }
     }, [isFlipped, backText])
+
+    useEffect(() => {
+        if (isFlipped && lang) {
+            setQuestion(backText[lang]);
+        }
+    }, [lang])
 
     return (
         <Box className="flip-card-container" onClick={handleCardClick}>
@@ -39,9 +47,6 @@ export default function CustomCard({backText, imgUrl, isFlipped, handleCardClick
                                      minHeight: 200,
                                  }}
                     >
-                        {/*<Typography variant="h5" align="center">*/}
-                        {/*    Перевернуть*/}
-                        {/*</Typography>*/}
                     </CardContent>
                 </Card>
 

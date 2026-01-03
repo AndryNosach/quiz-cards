@@ -18,25 +18,36 @@ import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
 import {supabase} from "../../api/SupabaseClient";
 import Typography from "@mui/material/Typography";
+import {languages} from "../../i18n/languages";
+import {useTranslate} from "../../hooks/useTranslate";
+import {useSelector} from "react-redux";
 
-function EditQuestions({currentCategory}) {
+function EditQuestions({currentCategory, setErrorMessage}) {
+
+    let lang = useSelector((state) => state.language.lang);
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(25);
     const [questions, setQuestions] = useState([]);
+    const [questionField, setQuestionField] = useState(`question_${lang}`);
 
     const emptyQuestion = {id: 0, question: '', edit: false};
+    const translator = useTranslate();
+
+    useEffect(() => {
+        setQuestionField(`question_${lang}`);
+    }, [lang]);
 
     useEffect(() => {
         if (currentCategory) {
             if (currentCategory.questions) {
-                const array = [emptyQuestion, ...currentCategory.questions.map((el) => {
+                const array = [{id: 0, question: '', edit: false}, ...currentCategory.questions.map((el) => {
                     return {...el, edit: false}
                 })];
                 array.sort((a, b) => a.id - b.id);
                 setQuestions(array);
             } else if (currentCategory.id) {
-                setQuestions([emptyQuestion]);
+                setQuestions([{id: 0, question: '', edit: false}]);
             } else {
                 setQuestions([])
             }
@@ -56,22 +67,54 @@ function EditQuestions({currentCategory}) {
     };
 
     const handleCellClick = (id) => {
-        setQuestions(prev => prev.map(el => id == el.id ? {...el, edit: true} : {...el, edit: false}));
+        setQuestions(prev => prev.map(el => id === el.id ? {...el, edit: true} : {...el, edit: false}));
     };
 
-    const setTempValue = (newValue, id) => {
-        setQuestions(prev => prev.map(el => id == el.id ? {...el, question: newValue} : el));
+    const setTempValue = (newValue, id, language) => {
+
+        const langField = `question_${language}`;
+        setQuestions(prev => prev.map(el => {
+            if (id === el.id) {
+                el[langField] = newValue;
+                return el;
+            } else {
+                return el;
+            }
+        }));
+    }
+
+    const isEmptyQuestion = (question) => {
+        return !question || (!question.question_ua && !question.question_ru && !question.question_en && !question.question_de);
+    }
+
+    const isIncompleteQuestion = (question) => {
+        return !isEmptyQuestion(question) && (!question.question_ua || !question.question_ru || !question.question_en || !question.question_de);
+    }
+
+    const isEquals = (question1, question2) => {
+        return question1.question_ua === question2.question_ua &&
+            question1.question_ru === question2.question_ru &&
+            question1.question_en === question2.question_en &&
+            question1.question_de === question2.question_de;
     }
 
     const saveNewValue = async (question) => {
+        setErrorMessage(null);
         console.log('save', question);
-        if (question.id == 0) {
-            if (!question.question) {
+        if (isIncompleteQuestion(question)) {
+            setErrorMessage(translator("incompleteQuestion"));
+            return;
+        }
+        if (question.id === 0) {
+            if (isEmptyQuestion(question)) {
                 setQuestions(prev => prev.map(el => ({...el, edit: false})));
                 return;
             }
             const savedData = await supabase.from("questions").insert({
-                question: question.question,
+                question_ua: question.question_ua,
+                question_ru: question.question_ru,
+                question_en: question.question_en,
+                question_de: question.question_de,
                 category_id: currentCategory.id
             }).select();
             questions.forEach(el => {
@@ -84,9 +127,14 @@ function EditQuestions({currentCategory}) {
             setQuestions(prev => [emptyQuestion, ...prev.map(el => ({...el, edit: false}))]);
             return;
         }
-        const prevQuestion = currentCategory.questions.find(el => el.id == question.id);
-        if (prevQuestion.question !== question.question) {
-            await supabase.from("questions").update({question: question.question}).eq('id', question.id);
+        const prevQuestion = currentCategory.questions.find(el => el.id === question.id);
+        if (!isEquals(prevQuestion, question)) {
+            await supabase.from("questions").update({
+                question_ua: question.question_ua,
+                question_ru: question.question_ru,
+                question_en: question.question_en,
+                question_de: question.question_de,
+            }).eq('id', question.id);
             currentCategory.questions = questions;
         }
         setQuestions(prev => prev.map(el => ({...el, edit: false})));
@@ -106,7 +154,7 @@ function EditQuestions({currentCategory}) {
             {questions && questions.length > 0 &&
             <Box className="edit-questions-table">
                 <TableContainer component={Paper}>
-                    <Table  aria-label="custom pagination table">
+                    <Table aria-label="custom pagination table">
                         <TableHead sx={{backgroundColor: '#e9e9e9'}}>
                             <TableRow>
                                 <TableCell sx={{fontWeight: "bold"}}>Вопрос</TableCell>
@@ -119,23 +167,108 @@ function EditQuestions({currentCategory}) {
                                     : questions
                             ).map((row) => (
                                 row && row.edit ?
-                                    <TableRow key={row.question}>
+                                    <TableRow key={row.question_ua}>
                                         <TableCell component="th" scope="row">
-                                            <TextField
-                                                autoFocus
-                                                fullWidth
-                                                value={row.question}
-                                                onChange={(e) => setTempValue(e.target.value, row.id)}
-                                                onKeyDown={() => {
-                                                }}
-                                                variant="outlined"
-                                                size="small"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        height: 40
-                                                    }
-                                                }}
-                                            />
+                                            <Box display="flex" alignItems="left" gap={1}>
+                                                <Box x={{paddingTop: '2px'}}>
+                                                    <img
+                                                        src={languages[0].flag}
+                                                        alt={languages[0].flag}
+                                                        width={22}
+                                                        height={16}
+                                                    />
+                                                </Box>
+                                                <TextField
+                                                    autoFocus
+                                                    fullWidth
+                                                    value={row.question_ua}
+                                                    onChange={(e) => setTempValue(e.target.value, row.id, 'ua')}
+                                                    onKeyDown={() => {
+                                                    }}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            height: 40
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box display="flex" alignItems="left" gap={1}>
+                                                <Box sx={{paddingTop: '18px'}}>
+                                                    <img
+                                                        src={languages[3].flag}
+                                                        alt={languages[3].flag}
+                                                        width={22}
+                                                        height={16}
+                                                    />
+                                                </Box>
+                                                <TextField
+                                                    fullWidth
+                                                    value={row.question_ru}
+                                                    onChange={(e) => setTempValue(e.target.value, row.id, 'ru')}
+                                                    onKeyDown={() => {
+                                                    }}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            height: 40,
+                                                            marginTop: 1
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box display="flex" alignItems="left" gap={1}>
+                                                <Box sx={{paddingTop: '18px'}}>
+                                                    <img
+                                                        src={languages[1].flag}
+                                                        alt={languages[1].flag}
+                                                        width={22}
+                                                        height={16}
+                                                    />
+                                                </Box>
+                                                <TextField
+                                                    fullWidth
+                                                    value={row.question_en}
+                                                    onChange={(e) => setTempValue(e.target.value, row.id, 'en')}
+                                                    onKeyDown={() => {
+                                                    }}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            height: 40,
+                                                            marginTop: 1
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box display="flex" alignItems="left" gap={1}>
+                                                <Box sx={{paddingTop: '18px'}}>
+                                                    <img
+                                                        src={languages[2].flag}
+                                                        alt={languages[2].flag}
+                                                        width={22}
+                                                        height={16}
+                                                    />
+                                                </Box>
+                                                <TextField
+                                                    fullWidth
+                                                    value={row.question_de}
+                                                    onChange={(e) => setTempValue(e.target.value, row.id, 'de')}
+                                                    onKeyDown={() => {
+                                                    }}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            height: 40,
+                                                            marginTop: 1
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <IconButton color="success" onClick={() => saveNewValue(row)}>
@@ -144,19 +277,19 @@ function EditQuestions({currentCategory}) {
                                         </TableCell>
                                     </TableRow>
                                     :
-                                    <TableRow key={row.question}>
+                                    <TableRow key={row.question_ua}>
                                         <TableCell scope="row" width="60px;">
                                             <Typography
                                                 sx={{
                                                     color: 'primary.main',
                                                 }}
                                             >
-                                                {row.question}
+                                                {row[questionField]}
                                             </Typography>
                                         </TableCell>
                                         <TableCell scope="row" width="10%">
                                             <Box className="question-btn-container">
-                                                <Box  sx={{alignContent: 'end'}}>
+                                                <Box sx={{alignContent: 'end'}}>
                                                     <Edit
                                                         fontSize="small"
                                                         sx={{cursor: 'pointer'}}
@@ -164,15 +297,15 @@ function EditQuestions({currentCategory}) {
                                                     />
                                                 </Box>
                                                 {row.id > 0 &&
-                                                    <Box sx={{marginLeft: 2}}>
-                                                        <IconButton color="error">
-                                                            <DeleteIcon
-                                                                fontSize="small"
-                                                                sx={{cursor: 'pointer'}}
-                                                                onClick={() => onRemove(row)}
-                                                            />
-                                                        </IconButton>
-                                                    </Box>
+                                                <Box sx={{marginLeft: 2}}>
+                                                    <IconButton color="error">
+                                                        <DeleteIcon
+                                                            fontSize="small"
+                                                            sx={{cursor: 'pointer'}}
+                                                            onClick={() => onRemove(row)}
+                                                        />
+                                                    </IconButton>
+                                                </Box>
                                                 }
                                             </Box>
                                         </TableCell>

@@ -271,7 +271,10 @@ function EditPage() {
                     />
                 </Box>
                 <Box>
-                    <EditQuestions currentCategory={currentCategory}/>
+                    <EditQuestions
+                        currentCategory={currentCategory}
+                        setErrorMessage={setErrorMessage}
+                    />
                 </Box>
                 <Box>
                     <Button

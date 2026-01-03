@@ -5,6 +5,7 @@ import CustomCard from "../../components/CustomCard/CustomCard";
 import {Button} from "@mui/material";
 import {Link, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
+import {useTranslate} from "../../hooks/useTranslate";
 
 function CardQuestions() {
 
@@ -13,6 +14,8 @@ function CardQuestions() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false)
     const [imgUrl, setImgUrl] = useState(null);
+
+    const translator = useTranslate();
 
     const fetchQuestions = useCallback(async () => {
         const {data, error} = await supabase.from("questions").select("*").eq("category_id", categoryId);
@@ -35,7 +38,6 @@ function CardQuestions() {
     }, [categoryId])
 
     useEffect(() => {
-        console.log("fetch categories")
         if (categoryId) {
             fetchQuestions();
             fetchBackgroundImg();
@@ -64,7 +66,14 @@ function CardQuestions() {
         <Box className="card-game">
             <Box>
                 <CustomCard
-                    backText={questions[currentIndex].question}
+                    backText={
+                        {
+                            ua: questions[currentIndex].question_ua,
+                            ru: questions[currentIndex].question_ru,
+                            en: questions[currentIndex].question_en,
+                            de: questions[currentIndex].question_de
+                        }
+                    }
                     imgUrl={imgUrl}
                     isFlipped={isFlipped}
                     handleCardClick={handleCardClick}
@@ -79,7 +88,7 @@ function CardQuestions() {
                         sx={{borderRadius: 8, margin: 1}}
                         onClick={() => handleReset()}
                     >
-                        Сбросить / Новая карта
+                        {translator("nextCard")}
                     </Button>
                 </Box>
                 <Box>
@@ -90,7 +99,7 @@ function CardQuestions() {
                         sx={{borderRadius: 8, margin: 1}}
                         component={Link}
                         to="/">
-                        Выйти
+                        {translator("exit")}
                     </Button>
                 </Box>
             </Box>

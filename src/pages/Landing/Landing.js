@@ -73,12 +73,6 @@ function Landing() {
                             {errorMessage}
                         </Alert>
                     )}
-                    {!errorMessage && (
-                            <Alert severity="success" sx={{mt: 2, width: '80%'}}>
-                                {translator("cardRules")}
-                            </Alert>
-                    )}
-
             </Box>
             <Box sx={{
                 display: "flex",

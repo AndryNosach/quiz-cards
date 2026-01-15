@@ -6,6 +6,7 @@ import {Button} from "@mui/material";
 import {Link, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
 import {useTranslate} from "../../hooks/useTranslate";
+import Alert from "@mui/material/Alert";
 
 function CardQuestions() {
 
@@ -90,6 +91,11 @@ function CardQuestions() {
                     >
                         {translator("nextCard")}
                     </Button>
+                </Box>
+                <Box>
+                    <Alert severity="success" sx={{mt: 2, width: '80%'}}>
+                        {translator("cardRules")}
+                    </Alert>
                 </Box>
                 <Box>
                     <Button

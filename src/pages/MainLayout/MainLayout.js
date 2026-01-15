@@ -10,7 +10,9 @@ const MainLayout = () => {
                     color="transparent"
                     elevation={0}
                     sx={{
+                        zIndex: 0,
                         backdropFilter: "blur(6px)",
+                        marginBottom: -8
                     }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
